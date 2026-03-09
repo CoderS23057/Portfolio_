@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sahil Vishwakarma — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#050505;--white:#f5f5f0;--mid:#777;
+  --font-display:'Bebas Neue',sans-serif;
+  --font-mono:'Space Mono',monospace;
+  --font-body:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0.76,0,0.24,1);
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden;cursor:none}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");background-size:200px;pointer-events:none;opacity:.55;z-index:9998}
+
+/* CURSOR */
+.cursor{position:fixed;width:12px;height:12px;background:var(--white);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s var(--ease),height .3s var(--ease);mix-blend-mode:difference;top:0;left:0}
+.cursor.expand{width:48px;height:48px}
+
+/* CANVAS */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.36}
+
+/* ── LOADER ── */
+#loader{
+  position:fixed;inset:0;
+  background:var(--black);
+  z-index:10000;
+  display:flex;
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:22px;
+}
+#loader.done{
+  animation:loaderOut .7s var(--ease) forwards;
+}
+@keyframes loaderOut{
+  0%{opacity:1;visibility:visible}
+  100%{opacity:0;visibility:hidden;pointer-events:none}
+}
+.loader-name{font-family:var(--font-display);font-size:clamp(38px,7vw,84px);letter-spacing:.1em;color:var(--white)}
+.loader-track{width:200px;height:1px;background:rgba(245,245,240,.12);position:relative;overflow:hidden}
+.loader-fill{position:absolute;top:0;left:0;height:100%;width:0;background:var(--white);transition:width .05s linear}
+.loader-num{font-family:var(--font-mono);font-size:11px;color:var(--mid);letter-spacing:.3em}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:22px 60px;border-bottom:1px solid rgba(245,245,240,.07);background:rgba(5,5,5,.9);backdrop-filter:blur(16px)}
+.nav-logo{font-family:var(--font-mono);font-size:13px;letter-spacing:.15em;color:var(--white);text-decoration:none}
+.nav-logo span{color:var(--mid)}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid);text-decoration:none;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--white);transition:width .4s var(--ease)}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+
+/* SECTIONS */
+section{min-height:100vh;padding:120px 60px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;z-index:1}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(52px);transition:opacity .85s var(--ease),transform .85s var(--ease)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.22s}.d3{transition-delay:.36s}.d4{transition-delay:.5s}
+
+.section-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--mid);margin-bottom:52px;display:flex;align-items:center;gap:14px}
+.section-label::before{content:'';width:28px;height:1px;background:var(--mid);display:inline-block}
+
+/* ══════════ HOME ══════════ */
+#home{padding:0 60px;justify-content:center;border-bottom:1px solid rgba(245,245,240,.07)}
+.home-inner{display:grid;grid-template-columns:1fr auto;align-items:center;gap:60px;width:100%;padding:100px 0 60px}
+
+.home-tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--mid);margin-bottom:20px}
+.home-name{font-family:var(--font-display);font-size:clamp(68px,11vw,178px);line-height:.88;letter-spacing:-.01em}
+.home-name .outline{-webkit-text-stroke:1.5px var(--white);color:transparent;display:block}
+.home-sub{font-family:var(--font-mono);font-size:12px;color:var(--mid);letter-spacing:.14em;margin-top:28px;max-width:360px;line-height:1.85}
+
+/* Photo side */
+.home-right{display:flex;flex-direction:column;align-items:center;gap:20px;flex-shrink:0}
+.photo-wrap{position:relative;width:300px;height:360px}
+/* corner accents */
+.photo-wrap::before,.photo-wrap::after,
+.photo-wrap .ca-tr,.photo-wrap .ca-bl{
+  content:'';position:absolute;width:26px;height:26px;
+  border-color:rgba(245,245,240,.45);border-style:solid;pointer-events:none;z-index:3
+}
+.photo-wrap::before{top:-5px;left:-5px;border-width:2px 0 0 2px;border-radius:8px 0 0 0}
+.photo-wrap::after{bottom:-5px;right:-5px;border-width:0 2px 2px 0;border-radius:0 0 8px 0}
+.photo-wrap .ca-tr{top:-5px;right:-5px;border-width:2px 2px 0 0;border-radius:0 8px 0 0}
+.photo-wrap .ca-bl{bottom:-5px;left:-5px;border-width:0 0 2px 2px;border-radius:0 0 0 8px}
+
+.photo-box{
+  width:100%;height:100%;
+  border-radius:50px;
+  overflow:hidden;
+  border:1px solid rgba(245,245,240,.14);
+  background:#111;
+  position:relative;
+}
+/* Real photo — swap src when ready */
+.photo-box img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+  display:block;
+  filter:grayscale(15%) contrast(1.05);
+  transition:filter .5s;
+}
+.photo-box:hover img{filter:none}
+
+/* Placeholder shown when no <img> */
+.photo-placeholder{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;
+  background:linear-gradient(160deg,#161616 0%,#0a0a0a 100%);
+  position:relative;overflow:hidden;
+}
+.pp-head{width:88px;height:88px;background:#242424;border-radius:50%;position:absolute;bottom:165px;left:50%;transform:translateX(-50%);border:1px solid #2e2e2e}
+.pp-body{width:150px;height:170px;background:linear-gradient(180deg,#1e1e1e,#131313);border-radius:75px 75px 0 0;position:absolute;bottom:0;left:50%;transform:translateX(-50%)}
+.pp-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:8px;letter-spacing:.22em;color:rgba(245,245,240,.2);text-transform:uppercase;white-space:nowrap;z-index:2}
+/* change-photo label */
+.photo-cta{font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;color:var(--mid);text-transform:uppercase;text-align:center;border:1px solid rgba(245,245,240,.1);padding:8px 16px;border-radius:2px}
+
+/* Tech badges under photo */
+.hero-badges{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:320px}
+.hb{display:flex;align-items:center;gap:7px;border:1px solid rgba(245,245,240,.1);padding:6px 13px;border-radius:3px;background:rgba(5,5,5,.65);backdrop-filter:blur(8px);font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:rgba(245,245,240,.65);animation:hbFloat var(--d,4s) ease-in-out infinite var(--dl,0s)}
+.hb svg{width:15px;height:15px;flex-shrink:0}
+@keyframes hbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+.home-scroll{position:absolute;bottom:28px;left:60px;display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:9px;letter-spacing:.25em;color:var(--mid);text-transform:uppercase;animation:scrollBob 3s ease-in-out infinite}
+.home-scroll::before{content:'';width:34px;height:1px;background:var(--mid)}
+@keyframes scrollBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+/* ══════════ ABOUT ══════════ */
+#about{border-bottom:1px solid rgba(245,245,240,.07)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.about-heading{font-family:var(--font-display);font-size:clamp(50px,6.5vw,108px);line-height:.95;margin-bottom:40px}
+.about-stats{display:flex;gap:44px}
+.stat-num{font-family:var(--font-display);font-size:58px;line-height:1}
+.stat-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--mid);text-transform:uppercase;margin-top:2px}
+.about-body{font-size:15px;color:rgba(245,245,240,.6);line-height:1.95}
+.about-body p+p{margin-top:18px}
+.about-body strong{color:var(--white);font-weight:500}
+.about-deco{position:absolute;right:40px;top:50%;transform:translateY(-50%);width:260px;height:260px;opacity:.09;pointer-events:none}
+
+/* ══════════ SKILLS ══════════ */
+#skills{border-bottom:1px solid rgba(245,245,240,.07)}
+.skills-heading{font-family:var(--font-display);font-size:clamp(50px,6.5vw,108px);line-height:.95;margin-bottom:56px}
+
+.icon-strip{display:flex;margin-bottom:44px;border:1px solid rgba(245,245,240,.08)}
+.ii{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 8px;border-right:1px solid rgba(245,245,240,.08);position:relative;overflow:hidden;cursor:default}
+.ii:last-child{border-right:none}
+.ii::before{content:'';position:absolute;inset:0;background:var(--white);transform:scaleY(0);transform-origin:bottom;transition:transform .42s var(--ease)}
+.ii:hover::before{transform:scaleY(1)}
+.ii>*{position:relative;z-index:1}
+.ii svg{width:32px;height:32px;transition:filter .4s}
+.ii:hover svg{filter:invert(1)}
+.ii-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);transition:color .4s;text-align:center}
+.ii:hover .ii-lbl{color:var(--black)}
+
+.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.sk{background:rgba(245,245,240,.025);border:1px solid rgba(245,245,240,.07);padding:34px 30px;position:relative;overflow:hidden}
+.sk::before{content:'';position:absolute;inset:0;background:var(--white);transform:scaleX(0);transform-origin:left;transition:transform .48s var(--ease);z-index:0}
+.sk:hover::before{transform:scaleX(1)}
+.sk>*{position:relative;z-index:1}
+.sk:hover .sk-num,.sk:hover .sk-sub{color:rgba(0,0,0,.42)}
+.sk:hover .sk-title{color:var(--black)}
+.sk:hover .pill{color:var(--black);border-color:rgba(0,0,0,.18)}
+.sk-num{font-family:var(--font-mono);font-size:9px;color:var(--mid);letter-spacing:.22em;margin-bottom:16px;transition:color .4s}
+.sk-icon{width:38px;height:38px;margin-bottom:12px}
+.sk-icon svg{width:100%;height:100%}
+.sk-title{font-family:var(--font-display);font-size:32px;letter-spacing:.02em;margin-bottom:16px;transition:color .4s}
+.sk-sub{font-family:var(--font-mono);font-size:9px;color:var(--mid);letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px;transition:color .4s}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;border:1px solid rgba(245,245,240,.13);padding:5px 11px;border-radius:2px;transition:border-color .3s,color .3s;cursor:default}
+
+/* ══════════ PROJECTS ══════════ */
+#projects{border-bottom:1px solid rgba(245,245,240,.07)}
+.projects-heading{font-family:var(--font-display);font-size:clamp(50px,6.5vw,108px);line-height:.95;margin-bottom:60px}
+.plist{display:flex;flex-direction:column}
+.pc{display:grid;grid-template-columns:68px 1fr 350px;gap:36px;align-items:center;padding:40px 0;border-top:1px solid rgba(245,245,240,.08);cursor:pointer;transition:padding-left .4s var(--ease)}
+.pc:last-child{border-bottom:1px solid rgba(245,245,240,.08)}
+.pc:hover{padding-left:18px}
+.pc-num{font-family:var(--font-mono);font-size:10px;color:var(--mid);letter-spacing:.22em;align-self:start;padding-top:5px}
+.pc-title{font-family:var(--font-display);font-size:clamp(32px,4vw,64px);line-height:.95;-webkit-text-stroke:1px rgba(245,245,240,.26);color:transparent;transition:color .4s,-webkit-text-stroke .4s;margin-bottom:10px}
+.pc:hover .pc-title{-webkit-text-stroke:0;color:var(--white)}
+.pc-desc{font-size:13px;color:rgba(245,245,240,.46);line-height:1.75;max-width:480px}
+.pc-tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.pc-tag{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);border:1px solid rgba(245,245,240,.1);padding:3px 9px;border-radius:2px}
+.pv{width:100%;aspect-ratio:16/9;position:relative;border:1px solid rgba(245,245,240,.08);overflow:hidden;border-radius:2px;background:#080808}
+.pv svg{width:100%;height:100%}
+.pv-ov{position:absolute;inset:0;background:linear-gradient(135deg,rgba(5,5,5,.3),transparent);pointer-events:none}
+.pv-lbl{position:absolute;bottom:9px;right:11px;font-family:var(--font-mono);font-size:8px;letter-spacing:.17em;color:rgba(245,245,240,.28);text-transform:uppercase}
+
+/* ══════════ CONNECT ══════════ */
+#connect{}
+.connect-heading{font-family:var(--font-display);font-size:clamp(56px,9vw,160px);line-height:.88;margin-bottom:64px;letter-spacing:-.02em}
+.connect-heading .outline{-webkit-text-stroke:1.5px var(--white);color:transparent;display:block}
+.soc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;max-width:800px}
+.sl{display:flex;align-items:center;justify-content:space-between;padding:28px 32px;border:1px solid rgba(245,245,240,.08);text-decoration:none;color:var(--white);position:relative;overflow:hidden;transition:color .4s}
+.sl::before{content:'';position:absolute;inset:0;background:var(--white);transform:translateY(101%);transition:transform .48s var(--ease)}
+.sl:hover::before{transform:translateY(0)}
+.sl>*{position:relative;z-index:1}
+.sl:hover{color:var(--black)}
+.sl-left{display:flex;align-items:center;gap:14px}
+.sl-left svg{width:24px;height:24px;flex-shrink:0;transition:filter .4s}
+.sl:hover .sl-left svg{filter:invert(1)}
+.sl-name{font-family:var(--font-display);font-size:24px;letter-spacing:.02em}
+.sl-handle{font-family:var(--font-mono);font-size:10px;color:var(--mid);letter-spacing:.1em;margin-top:2px;transition:color .4s}
+.sl:hover .sl-handle{color:rgba(0,0,0,.48)}
+.sl-arr{font-size:20px;opacity:.22;transition:opacity .3s,transform .4s var(--ease)}
+.sl:hover .sl-arr{opacity:1;transform:translate(4px,-4px)}
+.c-email{margin-top:48px;font-family:var(--font-mono);font-size:11px;color:var(--mid);letter-spacing:.2em}
+.c-email a{color:var(--white);text-decoration:none;border-bottom:1px solid rgba(245,245,240,.2);transition:border-color .3s}
+.c-email a:hover{border-color:var(--white)}
+
+/* FOOTER */
+footer{padding:26px 60px;border-top:1px solid rgba(245,245,240,.06);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+footer span{font-family:var(--font-mono);font-size:9px;color:var(--mid);letter-spacing:.2em;text-transform:uppercase}
+
+/* RESPONSIVE */
+@media(max-width:1000px){
+  section{padding:80px 28px}
+  nav{padding:18px 28px}.nav-links{gap:18px}
+  #home{padding:0 28px}
+  .home-inner{grid-template-columns:1fr;gap:36px;padding:100px 0 60px;justify-items:center;text-align:center}
+  .home-sub{margin:20px auto 0}
+  .home-right{width:100%;align-items:center}
+  .photo-wrap{width:210px;height:250px}
+  .home-scroll{left:28px}
+  .about-grid{grid-template-columns:1fr;gap:36px}
+  .about-deco{display:none}
+  .skill-grid{grid-template-columns:1fr}
+  .icon-strip{flex-wrap:wrap}.ii{flex:0 0 calc(50% - 1px)}
+  .pc{grid-template-columns:46px 1fr}.pv{display:none}
+  .soc-grid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:10px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── LOADER ── -->
+<div id="loader">
+  <div class="loader-name">SAHIL.DEV</div>
+  <div class="loader-track"><div class="loader-fill" id="lFill"></div></div>
+  <div class="loader-num" id="lNum">000</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#home" class="nav-logo">SV<span>.dev</span></a>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#connect">Connect</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════ HOME ══════════ -->
+<section id="home">
+  <div class="home-inner">
+
+    <!-- LEFT -->
+    <div class="home-left">
+      <div class="home-tag reveal">[ CSE B.Tech &mdash; Developer &amp; Designer ]</div>
+      <div class="home-name reveal d1">
+        SAHIL
+        <span class="outline">VISHWAKARMA</span>
+        
+      </div>
+      <p class="home-sub reveal d2">Building clean, functional<br>web experiences &mdash; one<br>line of code at a time.</p>
+    </div>
+
+    <!-- RIGHT: photo + badges -->
+    <div class="home-right reveal d2">
+      <div class="photo-wrap">
+        <span class="ca-tr"></span>
+        <span class="ca-bl"></span>
+        <div class="photo-box">
+          <!--
+            ══ REPLACE YOUR PHOTO ══
+            Remove the .photo-placeholder div below and add:
+            <img src="your-photo.jpg" alt="Sahil Vishwakarma" />
+            ════════════════════════
+          -->
+          <img src="me.jpeg" alt="Sahil Vishwakarma" />
+        </div>
+      </div>
+
+      <!-- Tech badges -->
+      <div class="hero-badges">
+        <div class="hb" style="--d:4.2s;--dl:0s">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="2.2" fill="#61DAFB"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" stroke="#61DAFB" stroke-width="1.3" fill="none"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" stroke="#61DAFB" stroke-width="1.3" fill="none" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9.5" ry="3.8" stroke="#61DAFB" stroke-width="1.3" fill="none" transform="rotate(120 12 12)"/></svg>
+          React
+        </div>
+        <div class="hb" style="--d:5s;--dl:.5s">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5L4 7v10l8 4.5 8-4.5V7z" fill="#339933" opacity=".9"/><path d="M12 6.5l-5 2.8V16l5 2.8 5-2.8V9.3z" fill="#3C873A"/><path d="M12 10v4M9.5 11.5l2.5-1.5 2.5 1.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Node.js
+        </div>
+        <div class="hb" style="--d:3.8s;--dl:1s">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="1.5" fill="#F7DF1E"/><text x="5" y="17" font-size="10" font-family="monospace" font-weight="bold" fill="#323330">JS</text></svg>
+          JavaScript
+        </div>
+        <div class="hb" style="--d:4.6s;--dl:.25s">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#004482"/><text x="4" y="16" font-size="9" font-family="monospace" font-weight="bold" fill="white">C++</text></svg>
+          C++ / DSA
+        </div>
+        <div class="hb" style="--d:5.3s;--dl:.8s">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 3l1.5 16.5L12 21l6.5-1.5L20 3z" fill="#E34F26"/><path d="M8 8h8M8.5 12h7l-.5 4-3 1-3-1z" stroke="white" stroke-width="1" opacity=".8"/></svg>
+          HTML5
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="home-scroll">Scroll to explore</div>
+</section>
+
+<!-- ══════════ ABOUT ══════════ -->
+<section id="about">
+  <div class="section-label reveal">02 &mdash; About Me</div>
+  <div class="about-grid">
+    <div>
+      <h2 class="about-heading reveal d1">WHO<br>I AM.</h2>
+      <div class="about-stats reveal d2">
+        <div><div class="stat-num">3+</div><div class="stat-label">Projects</div></div>
+        <div><div class="stat-num">5+</div><div class="stat-label">Technologies</div></div>
+        <div><div class="stat-num">&infin;</div><div class="stat-label">Curiosity</div></div>
+      </div>
+    </div>
+    <div class="about-body reveal d2">
+      <p>Hey, I'm <strong>Sahil Vishwakarma</strong> &mdash; a Computer Science &amp; Engineering student with a deep passion for crafting digital experiences that are both functional and visually refined.</p>
+      <p>I specialise in <strong>web development and UI/UX design</strong>, working across the full stack &mdash; from interactive front-ends with React to server-side logic with Node.js.</p>
+      <p>Beyond the browser, I ground my work in strong CS fundamentals: <strong>Data Structures &amp; Algorithms</strong> in C++, Operating Systems, DBMS, and Computer Networks &mdash; because great engineers understand what's under the hood.</p>
+      <p>I'm always building, always learning. Currently seeking opportunities to contribute, collaborate, and grow.</p>
+    </div>
+  </div>
+  <svg class="about-deco" viewBox="0 0 260 260" fill="none">
+    <circle cx="130" cy="130" r="112" stroke="white" stroke-width=".8" stroke-dasharray="6 10"/>
+    <circle cx="130" cy="130" r="82" stroke="white" stroke-width=".5" stroke-dasharray="3 13"/>
+    <circle cx="130" cy="130" r="52" stroke="white" stroke-width=".4" stroke-dasharray="2 8"/>
+    <circle cx="130" cy="130" r="26" stroke="white" stroke-width=".8"/>
+    <line x1="18" y1="130" x2="242" y2="130" stroke="white" stroke-width=".4" stroke-dasharray="4 8"/>
+    <line x1="130" y1="18" x2="130" y2="242" stroke="white" stroke-width=".4" stroke-dasharray="4 8"/>
+    <circle cx="130" cy="130" r="4" fill="white"/>
+    <circle cx="242" cy="130" r="3" fill="white" opacity=".5"/>
+    <circle cx="18" cy="130" r="3" fill="white" opacity=".5"/>
+    <circle cx="130" cy="18" r="3" fill="white" opacity=".5"/>
+    <circle cx="130" cy="242" r="3" fill="white" opacity=".5"/>
+  </svg>
+</section>
+
+<!-- ══════════ SKILLS ══════════ -->
+<section id="skills">
+  <div class="section-label reveal">03 &mdash; Technical Skills</div>
+  <h2 class="skills-heading reveal d1">MY<br>STACK.</h2>
+
+  <div class="icon-strip reveal d2">
+    <!-- HTML5 -->
+    <div class="ii"><svg viewBox="0 0 32 32" fill="none"><path d="M4 3l2 22L16 28l10-3 2-22z" fill="#E34F26"/><path d="M16 7H9.5l.4 5H16v4h-5.7l.4 4.5L16 21.8V26l-5.5-1.6-.6-4.9H12l.3 2.2L16 22v-3.5H10.8L10.3 13H16V7z" fill="white"/><path d="M16 7h6.5l-.4 5H16v4h5.7l-.5 5.5L16 22.5V26l5.5-1.6.7-5H20l-.3-2.4H16z" fill="#EBEBEB"/></svg><span class="ii-lbl">HTML5</span></div>
+    <!-- CSS3 -->
+    <div class="ii"><svg viewBox="0 0 32 32" fill="none"><path d="M4 3l2 22L16 28l10-3 2-22z" fill="#1572B6"/><path d="M16 7H9l.5 5.5H16V17H10.5l.3 3.5L16 21.8V26l-4.7-1.5-.4-5H13l.3 2.2L16 23V19H9.8L9 8H16z" fill="white"/><path d="M16 7h7l-.8 9H16v-4.5h6.2l-.4-4.5H16zm0 10h4.8l-.5 5.5-4.3 1.2V26l4.7-1.5.6-6.5H16z" fill="#EBEBEB"/></svg><span class="ii-lbl">CSS3</span></div>
+    <!-- JS -->
+    <div class="ii"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="2" fill="#F7DF1E"/><text x="6" y="23" font-size="14" font-family="monospace" font-weight="bold" fill="#323330">JS</text></svg><span class="ii-lbl">JavaScript</span></div>
+    <!-- React -->
+    <div class="ii"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="3" fill="#61DAFB"/><ellipse cx="16" cy="16" rx="13" ry="5" stroke="#61DAFB" stroke-width="1.5" fill="none"/><ellipse cx="16" cy="16" rx="13" ry="5" stroke="#61DAFB" stroke-width="1.5" fill="none" transform="rotate(60 16 16)"/><ellipse cx="16" cy="16" rx="13" ry="5" stroke="#61DAFB" stroke-width="1.5" fill="none" transform="rotate(120 16 16)"/></svg><span class="ii-lbl">React</span></div>
+    <!-- Node -->
+    <div class="ii"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3L5 9v14l11 6 11-6V9z" fill="#339933"/><path d="M16 8L9 12v8l7 3.8 7-3.8V12z" fill="#3C873A"/><path d="M16 13v6M13 14.5l3-1.8 3 1.8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg><span class="ii-lbl">Node.js</span></div>
+    <!-- C++ -->
+    <div class="ii"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#00427E"/><text x="3" y="21" font-size="13" font-family="monospace" font-weight="bold" fill="white">C++</text></svg><span class="ii-lbl">C++ / DSA</span></div>
+    <!-- Figma -->
+    <div class="ii"><svg viewBox="0 0 32 32" fill="none"><rect x="10" y="2" width="12" height="10" rx="5" fill="#F24E1E"/><rect x="10" y="12" width="12" height="10" rx="5" fill="#A259FF"/><rect x="10" y="22" width="12" height="8" rx="4" fill="#0ACF83"/><circle cx="22" cy="17" r="5" fill="#1ABCFE"/><rect x="10" y="12" width="6" height="10" fill="#FF7262"/></svg><span class="ii-lbl">Figma</span></div>
+    <!-- Git -->
+    <div class="ii"><svg viewBox="0 0 32 32" fill="none"><path d="M29 14.8L17.2 3a2 2 0 00-2.8 0l-2.8 2.8 3.5 3.5a2.3 2.3 0 012.9 2.95l3.36 3.36a2.33 2.33 0 11-1.42 1.42l-3.13-3.13v8.2a2.33 2.33 0 11-2.8-.12v-8.3a2.33 2.33 0 01-1.27-3.06L9.3 7.07 3 13.38a2 2 0 000 2.82l11.8 11.8a2 2 0 002.82 0L29 17.6a2 2 0 000-2.8z" fill="#F05032"/></svg><span class="ii-lbl">Git</span></div>
+  </div>
+
+  <div class="skill-grid">
+    <div class="sk reveal">
+      <div class="sk-num">01</div>
+      <div class="sk-icon"><svg viewBox="0 0 40 40" fill="none"><rect x="2" y="6" width="36" height="28" rx="3" stroke="rgba(245,245,240,.5)" stroke-width="1.5"/><path d="M8 18l6 6-6 6M18 30h14" stroke="rgba(245,245,240,.7)" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="sk-title">WEB DEV</div>
+      <div class="sk-sub">Frontend &amp; Backend</div>
+      <div class="pills"><span class="pill">HTML5</span><span class="pill">CSS3</span><span class="pill">JavaScript</span><span class="pill">React.js</span><span class="pill">Node.js</span></div>
+    </div>
+    <div class="sk reveal d1">
+      <div class="sk-num">02</div>
+      <div class="sk-icon"><svg viewBox="0 0 40 40" fill="none"><rect x="4" y="4" width="32" height="32" rx="4" stroke="rgba(245,245,240,.5)" stroke-width="1.5"/><circle cx="14" cy="14" r="4" stroke="rgba(245,245,240,.55)" stroke-width="1.2"/><rect x="20" y="10" width="12" height="3" rx="1.5" fill="rgba(245,245,240,.28)"/><rect x="20" y="16" width="8" height="3" rx="1.5" fill="rgba(245,245,240,.18)"/><rect x="8" y="24" width="24" height="2" rx="1" fill="rgba(245,245,240,.18)"/><rect x="8" y="29" width="16" height="2" rx="1" fill="rgba(245,245,240,.12)"/></svg></div>
+      <div class="sk-title">DESIGN</div>
+      <div class="sk-sub">UI &amp; Visual</div>
+      <div class="pills"><span class="pill">UI Design</span><span class="pill">Responsive</span><span class="pill">CSS Anim</span><span class="pill">Figma</span></div>
+    </div>
+    <div class="sk reveal d2">
+      <div class="sk-num">03</div>
+      <div class="sk-icon"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="16" stroke="rgba(245,245,240,.5)" stroke-width="1.5"/><circle cx="20" cy="20" r="8" stroke="rgba(245,245,240,.28)" stroke-width="1"/><line x1="4" y1="20" x2="36" y2="20" stroke="rgba(245,245,240,.22)" stroke-width="1"/><line x1="20" y1="4" x2="20" y2="36" stroke="rgba(245,245,240,.22)" stroke-width="1"/><circle cx="20" cy="20" r="2.5" fill="rgba(245,245,240,.7)"/></svg></div>
+      <div class="sk-title">CS CORE</div>
+      <div class="sk-sub">Fundamentals</div>
+      <div class="pills"><span class="pill">DSA (C++)</span><span class="pill">OS</span><span class="pill">DBMS</span><span class="pill">Networks</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PROJECTS ══════════ -->
+<section id="projects">
+  <div class="section-label reveal">04 &mdash; Projects</div>
+  <h2 class="projects-heading reveal d1">SELECTED<br>WORK.</h2>
+  <div class="plist">
+
+    <div class="pc reveal">
+      <div class="pc-num">001</div>
+      <div>
+        <div class="pc-title">DEV CONNECT</div>
+        <p class="pc-desc">A full-stack developer networking platform &mdash; JWT auth, REST APIs, and a React frontend where engineers discover projects and collaborate in real-time.</p>
+        <div class="pc-tags"><span class="pc-tag">React</span><span class="pc-tag">Node.js</span><span class="pc-tag">MongoDB</span><span class="pc-tag">JWT</span></div>
+      </div>
+      <div class="pv">
+        <svg viewBox="0 0 350 196" fill="none"><rect width="350" height="196" fill="#080808"/><rect width="350" height="30" fill="#111"/><circle cx="14" cy="15" r="4" fill="#2a2a2a"/><circle cx="26" cy="15" r="4" fill="#2a2a2a"/><circle cx="38" cy="15" r="4" fill="#2a2a2a"/><rect x="52" y="9" width="56" height="12" rx="2" fill="#1a1a1a"/><rect x="270" y="9" width="36" height="12" rx="2" fill="#1e1e1e"/><rect x="313" y="7" width="30" height="16" rx="3" fill="#252525"/>
+        <rect x="10" y="42" width="100" height="70" rx="3" fill="#0f0f0f" stroke="#1e1e1e" stroke-width=".7"/><circle cx="30" cy="60" r="11" fill="#1a1a1a" stroke="#252525" stroke-width=".7"/><text x="24" y="65" font-size="9" fill="rgba(245,245,240,.3)" font-family="monospace">SV</text><rect x="47" y="54" width="50" height="5" rx="2" fill="#222"/><rect x="47" y="63" width="34" height="4" rx="2" fill="#1a1a1a"/><rect x="12" y="80" width="96" height="3" rx="1" fill="#181818"/><rect x="12" y="88" width="72" height="3" rx="1" fill="#151515"/><rect x="12" y="98" width="52" height="12" rx="2" fill="#1e1e1e" stroke="#2a2a2a" stroke-width=".6"/>
+        <rect x="122" y="42" width="100" height="70" rx="3" fill="#0f0f0f" stroke="#f5f5f0" stroke-width=".6" stroke-opacity=".14"/><circle cx="142" cy="60" r="11" fill="#1c1c1c" stroke="#2a2a2a" stroke-width=".7"/><text x="136" y="65" font-size="9" fill="rgba(245,245,240,.32)" font-family="monospace">AK</text><rect x="159" y="54" width="50" height="5" rx="2" fill="#252525"/><rect x="159" y="63" width="34" height="4" rx="2" fill="#1e1e1e"/><rect x="124" y="80" width="96" height="3" rx="1" fill="#1e1e1e"/><rect x="124" y="88" width="72" height="3" rx="1" fill="#1a1a1a"/><rect x="124" y="98" width="52" height="12" rx="2" fill="#f5f5f0" fill-opacity=".06" stroke="#f5f5f0" stroke-width=".5" stroke-opacity=".18"/>
+        <rect x="234" y="42" width="106" height="70" rx="3" fill="#0f0f0f" stroke="#1e1e1e" stroke-width=".7"/><circle cx="254" cy="60" r="11" fill="#1a1a1a" stroke="#252525" stroke-width=".7"/><text x="248" y="65" font-size="9" fill="rgba(245,245,240,.3)" font-family="monospace">RK</text><rect x="271" y="54" width="50" height="5" rx="2" fill="#222"/><rect x="271" y="63" width="34" height="4" rx="2" fill="#1a1a1a"/><rect x="236" y="80" width="102" height="3" rx="1" fill="#181818"/><rect x="236" y="88" width="76" height="3" rx="1" fill="#151515"/>
+        <rect x="0" y="164" width="350" height="32" fill="#0d0d0d"/><rect x="10" y="174" width="46" height="12" rx="6" fill="#181818"/><rect x="64" y="174" width="46" height="12" rx="6" fill="#181818"/></svg>
+        <div class="pv-ov"></div><div class="pv-lbl">Full Stack App</div>
+      </div>
+    </div>
+
+    <div class="pc reveal d1">
+      <div class="pc-num">002</div>
+      <div>
+        <div class="pc-title">ALGO VISUALISER</div>
+        <p class="pc-desc">Interactive browser tool animating sorting and pathfinding algorithms in real-time. Includes Bubble Sort, Merge Sort, Dijkstra, and A* &mdash; making DSA intuitive and visual.</p>
+        <div class="pc-tags"><span class="pc-tag">HTML</span><span class="pc-tag">CSS</span><span class="pc-tag">JavaScript</span><span class="pc-tag">DSA</span></div>
+      </div>
+      <div class="pv">
+        <svg viewBox="0 0 350 196" fill="none"><rect width="350" height="196" fill="#080808"/><rect width="350" height="26" fill="#101010"/><rect x="8" y="7" width="74" height="12" rx="2" fill="#1a1a1a"/><rect x="270" y="7" width="70" height="12" rx="2" fill="#1e1e1e"/>
+        <rect x="12" y="36" width="14" height="110" rx="2" fill="#f5f5f0" opacity=".1"/><rect x="30" y="70" width="14" height="76" rx="2" fill="#f5f5f0" opacity=".1"/><rect x="48" y="50" width="14" height="96" rx="2" fill="#f5f5f0" opacity=".18"/><rect x="66" y="32" width="14" height="114" rx="2" fill="white" opacity=".88"/><rect x="84" y="46" width="14" height="100" rx="2" fill="white" opacity=".65"/><rect x="102" y="88" width="14" height="58" rx="2" fill="#f5f5f0" opacity=".1"/><rect x="120" y="58" width="14" height="88" rx="2" fill="#f5f5f0" opacity=".16"/><rect x="138" y="78" width="14" height="68" rx="2" fill="#f5f5f0" opacity=".1"/><line x1="12" y1="148" x2="156" y2="148" stroke="#1e1e1e" stroke-width=".8"/>
+        <rect x="178" y="32" width="160" height="128" rx="2" fill="#0c0c0c" stroke="#1a1a1a" stroke-width=".7"/>
+        <line x1="178" y1="52" x2="338" y2="52" stroke="#1a1a1a" stroke-width=".5"/><line x1="178" y1="72" x2="338" y2="72" stroke="#1a1a1a" stroke-width=".5"/><line x1="178" y1="92" x2="338" y2="92" stroke="#1a1a1a" stroke-width=".5"/><line x1="178" y1="112" x2="338" y2="112" stroke="#1a1a1a" stroke-width=".5"/><line x1="178" y1="132" x2="338" y2="132" stroke="#1a1a1a" stroke-width=".5"/>
+        <line x1="198" y1="32" x2="198" y2="160" stroke="#1a1a1a" stroke-width=".5"/><line x1="218" y1="32" x2="218" y2="160" stroke="#1a1a1a" stroke-width=".5"/><line x1="238" y1="32" x2="238" y2="160" stroke="#1a1a1a" stroke-width=".5"/><line x1="258" y1="32" x2="258" y2="160" stroke="#1a1a1a" stroke-width=".5"/><line x1="278" y1="32" x2="278" y2="160" stroke="#1a1a1a" stroke-width=".5"/><line x1="298" y1="32" x2="298" y2="160" stroke="#1a1a1a" stroke-width=".5"/><line x1="318" y1="32" x2="318" y2="160" stroke="#1a1a1a" stroke-width=".5"/>
+        <rect x="218" y="52" width="20" height="20" fill="#222"/><rect x="238" y="72" width="20" height="20" fill="#222"/><rect x="258" y="92" width="20" height="20" fill="#222"/>
+        <rect x="198" y="52" width="20" height="20" fill="white" opacity=".14"/><rect x="198" y="72" width="20" height="20" fill="white" opacity=".24"/><rect x="198" y="92" width="20" height="20" fill="white" opacity=".36"/><rect x="198" y="112" width="20" height="20" fill="white" opacity=".5"/><rect x="218" y="112" width="20" height="20" fill="white" opacity=".5"/><rect x="238" y="112" width="20" height="20" fill="white" opacity=".5"/><rect x="258" y="112" width="20" height="20" fill="white" opacity=".5"/><rect x="278" y="112" width="20" height="20" fill="white" opacity=".5"/><rect x="278" y="92" width="20" height="20" fill="white" opacity=".36"/><rect x="278" y="72" width="20" height="20" fill="white" opacity=".24"/><rect x="278" y="52" width="20" height="20" fill="white" opacity=".14"/>
+        <rect x="178" y="52" width="20" height="20" fill="white" opacity=".82"/><rect x="318" y="32" width="20" height="20" fill="white" opacity=".48"/></svg>
+        <div class="pv-ov"></div><div class="pv-lbl">DSA Visualiser</div>
+      </div>
+    </div>
+
+    <div class="pc reveal d2">
+      <div class="pc-num">003</div>
+      <div>
+        <div class="pc-title">TASK FLOW</div>
+        <p class="pc-desc">Minimalist productivity app with a drag-and-drop Kanban board, persistent state, and a clean dark UI. Smooth micro-interactions for distraction-free focus.</p>
+        <div class="pc-tags"><span class="pc-tag">React</span><span class="pc-tag">CSS Modules</span><span class="pc-tag">DnD API</span></div>
+      </div>
+      <div class="pv">
+        <svg viewBox="0 0 350 196" fill="none"><rect width="350" height="196" fill="#080808"/><rect width="350" height="34" fill="#0f0f0f"/><rect x="10" y="9" width="86" height="16" rx="3" fill="#1a1a1a"/><rect x="308" y="9" width="34" height="16" rx="3" fill="#222"/>
+        <rect x="8" y="46" width="104" height="144" rx="3" fill="#0c0c0c" stroke="#181818" stroke-width=".8"/><rect x="14" y="52" width="46" height="8" rx="2" fill="#1e1e1e"/><rect x="14" y="68" width="92" height="34" rx="2" fill="#141414" stroke="#1e1e1e" stroke-width=".7"/><rect x="20" y="75" width="56" height="5" rx="1.5" fill="#252525"/><rect x="20" y="84" width="38" height="4" rx="1.5" fill="#1c1c1c"/><rect x="14" y="110" width="92" height="34" rx="2" fill="#141414" stroke="#1e1e1e" stroke-width=".7"/><rect x="20" y="117" width="68" height="5" rx="1.5" fill="#252525"/><rect x="20" y="126" width="46" height="4" rx="1.5" fill="#1c1c1c"/>
+        <rect x="122" y="46" width="104" height="144" rx="3" fill="#0c0c0c" stroke="#181818" stroke-width=".8"/><rect x="128" y="52" width="60" height="8" rx="2" fill="#1e1e1e"/><rect x="128" y="68" width="92" height="34" rx="2" fill="#141414" stroke="#1e1e1e" stroke-width=".7"/><rect x="134" y="75" width="64" height="5" rx="1.5" fill="#252525"/><rect x="134" y="84" width="44" height="4" rx="1.5" fill="#1c1c1c"/>
+        <rect x="128" y="110" width="92" height="42" rx="2" fill="#1c1c1c" stroke="#f5f5f0" stroke-width=".7" stroke-opacity=".17"/><rect x="134" y="117" width="74" height="5" rx="1.5" fill="#2e2e2e"/><rect x="134" y="126" width="52" height="4" rx="1.5" fill="#242424"/><rect x="134" y="134" width="32" height="11" rx="2" fill="#f5f5f0" fill-opacity=".05" stroke="#f5f5f0" stroke-width=".5" stroke-opacity=".14"/>
+        <rect x="236" y="46" width="106" height="144" rx="3" fill="#0c0c0c" stroke="#181818" stroke-width=".8"/><rect x="242" y="52" width="34" height="8" rx="2" fill="#1e1e1e"/>
+        <rect x="242" y="68" width="94" height="34" rx="2" fill="#111" stroke="#181818" stroke-width=".7" opacity=".7"/><rect x="248" y="75" width="52" height="5" rx="1.5" fill="#1e1e1e" opacity=".6"/><rect x="248" y="84" width="36" height="4" rx="1.5" fill="#181818" opacity=".6"/><path d="M326 75l3 3 6-5" stroke="#f5f5f0" stroke-width="1.1" stroke-linecap="round" opacity=".22"/>
+        <rect x="242" y="110" width="94" height="34" rx="2" fill="#111" stroke="#181818" stroke-width=".7" opacity=".5"/><rect x="248" y="117" width="64" height="5" rx="1.5" fill="#1e1e1e" opacity=".5"/><rect x="248" y="126" width="42" height="4" rx="1.5" fill="#181818" opacity=".5"/><path d="M326 117l3 3 6-5" stroke="#f5f5f0" stroke-width="1.1" stroke-linecap="round" opacity=".18"/></svg>
+        <div class="pv-ov"></div><div class="pv-lbl">Productivity App</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ CONNECT ══════════ -->
+<section id="connect">
+  <div class="section-label reveal">05 &mdash; Connect</div>
+  <div class="connect-heading reveal d1">LET'S<span class="outline">TALK.</span></div>
+  <div class="soc-grid">
+    <a href="https://github.com/CoderS23057" target="_blank" class="sl reveal">
+      <div class="sl-left">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <div><div class="sl-name">GITHUB</div><div class="sl-handle">@sahilvishwakarma</div></div>
+      </div>
+      <div class="sl-arr">&#8599;</div>
+    </a>
+    <a href="https://www.linkedin.com/in/sahil-vishwakarma-021684297/" target="_blank" class="sl reveal d1">
+      <div class="sl-left">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <div><div class="sl-name">LINKEDIN</div><div class="sl-handle">/in/sahilvishwakarma</div></div>
+      </div>
+      <div class="sl-arr">&#8599;</div>
+    </a>
+    <a href="https://twitter.com/sahilvishwakarma" target="_blank" class="sl reveal d2">
+      <div class="sl-left">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <div><div class="sl-name">TWITTER / X</div><div class="sl-handle">@sahilvishwakarma</div></div>
+      </div>
+      <div class="sl-arr">&#8599;</div>
+    </a>
+    <a href="https://www.instagram.com/ixl_sahil/" target="_blank" class="sl reveal d3">
+      <div class="sl-left">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        <div><div class="sl-name">INSTAGRAM</div><div class="sl-handle">@sahilvishwakarma</div></div>
+      </div>
+      <div class="sl-arr">&#8599;</div>
+    </a>
+  </div>
+  <div class="c-email reveal d4">
+    Or reach me directly &mdash; <a href="mailto:sahilvishwakarma2004@email.com">sahilvishwakarma2004@email.com</a>
+  </div>
+</section>
+
+<footer>
+  <span>&copy; 2025 Sahil Vishwakarma</span>
+  <span>CSE B.Tech &mdash; Developer &amp; Designer</span>
+  <span>Built with HTML &middot; CSS &middot; JS</span>
+</footer>
+
+<script>
+// ── CURSOR ──
+var cur = document.getElementById('cursor');
+document.addEventListener('mousemove', function(e){
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+document.querySelectorAll('a,button,.pc,.sk,.sl,.ii').forEach(function(el){
+  el.addEventListener('mouseenter', function(){ cur.classList.add('expand'); });
+  el.addEventListener('mouseleave', function(){ cur.classList.remove('expand'); });
+});
+
+// ── LOADER ── (guaranteed to finish)
+var loader  = document.getElementById('loader');
+var lFill   = document.getElementById('lFill');
+var lNum    = document.getElementById('lNum');
+var pct     = 0;
+
+function finishLoader(){
+  loader.classList.add('done');
+  // hard-remove after animation completes so nothing can block page
+  setTimeout(function(){ loader.style.display = 'none'; }, 800);
+  // trigger home reveals
+  setTimeout(function(){
+    document.querySelectorAll('#home .reveal').forEach(function(el){
+      el.classList.add('visible');
+    });
+  }, 200);
+}
+
+var loaderTimer = setInterval(function(){
+  pct = Math.min(pct + Math.floor(Math.random() * 14) + 5, 100);
+  lFill.style.width = pct + '%';
+  lNum.textContent  = String(pct).padStart(3, '0');
+  if(pct >= 100){
+    clearInterval(loaderTimer);
+    setTimeout(finishLoader, 250);
+  }
+}, 55);
+
+// Absolute failsafe: force-dismiss after 4s no matter what
+setTimeout(function(){
+  if(loader.style.display !== 'none'){
+    clearInterval(loaderTimer);
+    finishLoader();
+  }
+}, 4000);
+
+// ── PARTICLE CANVAS ──
+(function(){
+  var canvas = document.getElementById('bg-canvas');
+  var ctx    = canvas.getContext('2d');
+  var W, H;
+  var mouse  = { x: -999, y: -999 };
+  var COUNT  = 75;
+  var pts    = [];
+
+  function resize(){
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  window.addEventListener('mousemove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+
+  for(var i = 0; i < COUNT; i++){
+    pts.push({
+      x:  Math.random() * window.innerWidth,
+      y:  Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.32,
+      vy: (Math.random() - 0.5) * 0.32,
+      r:  Math.random() * 1.3 + 0.4
+    });
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    for(var i = 0; i < pts.length; i++){
+      for(var j = i + 1; j < pts.length; j++){
+        var dx = pts[i].x - pts[j].x;
+        var dy = pts[i].y - pts[j].y;
+        var d  = Math.sqrt(dx*dx + dy*dy);
+        if(d < 145){
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(245,245,240,' + ((1 - d/145) * 0.12) + ')';
+          ctx.lineWidth   = 0.5;
+          ctx.moveTo(pts[i].x, pts[i].y);
+          ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.stroke();
+        }
+      }
+      var mdx = pts[i].x - mouse.x;
+      var mdy = pts[i].y - mouse.y;
+      var md  = Math.sqrt(mdx*mdx + mdy*mdy);
+      if(md < 185){
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(245,245,240,' + ((1 - md/185) * 0.2) + ')';
+        ctx.lineWidth   = 0.5;
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.arc(pts[i].x, pts[i].y, pts[i].r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(245,245,240,0.36)';
+      ctx.fill();
+      pts[i].x += pts[i].vx;
+      pts[i].y += pts[i].vy;
+      if(pts[i].x < 0 || pts[i].x > W) pts[i].vx *= -1;
+      if(pts[i].y < 0 || pts[i].y > H) pts[i].vy *= -1;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── SCROLL REVEAL ──
+var revEls = document.querySelectorAll('.reveal');
+var revObs = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+revEls.forEach(function(el){ revObs.observe(el); });
+
+// ── ACTIVE NAV ──
+var secs  = document.querySelectorAll('section[id]');
+var navAs = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', function(){
+  var cur = '';
+  secs.forEach(function(s){
+    if(window.scrollY >= s.offsetTop - 220) cur = s.id;
+  });
+  navAs.forEach(function(a){
+    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+  });
+}, { passive: true });
+</script>
+</body>
+</html>
